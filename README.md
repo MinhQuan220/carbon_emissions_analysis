@@ -125,7 +125,7 @@ FROM product_emissions;
 ### 3.1. Which products contribute the most to carbon emissions?
 ```SQL
 SELECT  product_name,
-		ROUND(AVG(carbon_footprint_pcf),2) AS 'Avarage PCF'
+	ROUND(AVG(carbon_footprint_pcf),2) AS 'Avarage PCF'
 FROM product_emissions
 GROUP BY product_name
 ORDER BY carbon_footprint_pcf DESC
@@ -139,11 +139,99 @@ LIMIT 10;
 |Wind Turbine G114 2 Megawats|1532608.00|
 |Wind Turbine G90 2 Megawats|1251625.00|
 |Land Cruiser Prado. FJ Cruiser. Dyna trucks. Toyoace.IMV def unit.|191687.00|
-|Retaining wall structure with a main wall (sheet pile): 136 tonnes of steel sheet piles and 4 tonnes of tierods per 100 meter wall|167000.00|
-|TCDE|99075.00|
-|Mercedes-Benz GLE (GLE 500 4MATIC)|91000.00|
-|Mercedes-Benz S-Class (S 500)|85000.00|
-|Mercedes-Benz SL (SL 350)|72000.00|
 
+Conclusion: The products that contribute the most to carbon emissions are primarily Wind Turbines, with models such as the Wind Turbine G128 5 Megawatts and Wind Turbine G132 5 Megawatts leading the list due to their exceptionally high PCF values. Despite their vital role in renewable energy, these findings emphasize the environmental impact during their production and lifecycle.
 
+### 3.2. What are the industry groups of these products?
+```SQL
+SELECT  ig.industry_group,
+	p.product_name,
+	ROUND(AVG(carbon_footprint_pcf),2) AS 'Avarage PCF'
+FROM product_emissions AS p
+JOIN industry_groups AS ig ON  p.industry_group_id = ig.id
+GROUP BY product_name
+ORDER BY carbon_footprint_pcf DESC
+LIMIT 5;
 
+```
+|industry_group|product_name|Avarage PCF|
+|--------------|------------|-----------|
+|Electrical Equipment and Machinery|Wind Turbine G128 5 Megawats|3718044.00|
+|Electrical Equipment and Machinery|Wind Turbine G132 5 Megawats|3276187.00|
+|Electrical Equipment and Machinery|Wind Turbine G114 2 Megawats|1532608.00|
+|Electrical Equipment and Machinery|Wind Turbine G90 2 Megawats|1251625.00|
+|Automobiles & Components|Land Cruiser Prado. FJ Cruiser. Dyna trucks. Toyoace.IMV def unit.|191687.00|
+
+Conclusion: The industry groups of the listed products highlight their diverse sectors. The Wind Turbines (G128, G132, G114, G90) belong to the Electrical Equipment and Machinery industry group, reflecting their role in energy production and machinery. Meanwhile, the Land Cruiser Prado, FJ Cruiser, Dyna Trucks, Toyoace.IMV Def Unit falls under the Automobiles & Components group, emphasizing its alignment with the automotive sector. 
+
+### 3.3. What are the industries with the highest contribution to carbon emissions?
+```SQL
+SELECT
+	ig.industry_group, 
+	ROUND(SUM(p.carbon_footprint_pcf),2) AS total_emissions
+FROM product_emissions AS p
+JOIN industry_groups AS ig ON p.industry_group_id = ig.id
+GROUP BY ig.industry_group
+ORDER BY total_emissions DESC
+LIMIT 1;
+```
+|industry_group|total_emissions|
+|--------------|---------------|
+|Electrical Equipment and Machinery|9801558.00|
+
+Conclusion: The Electrical Equipment and Machinery industry stands out as the largest contributor to carbon emissions, with a total of 9,801,558. This highlights its significant environmental impact, emphasizing the need for innovation and sustainable practices within this sector to mitigate its carbon footprint.
+
+### 3.4. What are the companies with the highest contribution to carbon emissions?
+```SQL
+SELECT 	
+	cp.company_name, 
+	ROUND(SUM(p.carbon_footprint_pcf),2) AS total_emissions
+FROM product_emissions AS p
+JOIN companies AS cp ON p.company_id  = cp.id
+GROUP BY cp.company_name
+ORDER BY total_emissions DESC
+LIMIT 1;
+```
+|company_name|total_emissions|
+|------------|---------------|
+|"Gamesa Corporación Tecnológica, S.A."|9778464.00|
+
+Conclusion: The company with the highest contribution to carbon emissions is "Gamesa Corporación Tecnológica, S.A.", with a total emission of 9,778,464. This significant figure highlights the environmental impact of its operations and underscores the importance of adopting sustainable practices to mitigate its carbon footprint.
+
+### 3.5. What are the countries with the highest contribution to carbon emissions?
+```SQL
+SELECT 	
+	ct.country_name, 
+	ROUND(SUM(p.carbon_footprint_pcf),2) AS total_emissions
+FROM product_emissions AS p
+JOIN countries AS ct ON p.country_id  = ct.id
+GROUP BY ct.country_name
+ORDER BY total_emissions DESC
+LIMIT 1;
+```
+|country_name|total_emissions|
+|------------|---------------|
+|Spain|9786130.00|
+
+Conclusion: The country with the highest contribution to carbon emissions is Spain, with a total emission of 9,778,464. This highlights the significant impact of activities in Spain on the global carbon footprint, emphasizing the importance of exploring sustainable practices in industries operating within the country.
+
+### 3.6. What is the trend of carbon footprints (PCFs) over the years?
+```SQL
+SELECT 
+    p.year, 
+    SUM(p.carbon_footprint_pcf) AS total_emissions
+FROM product_emissions p
+GROUP BY p.year
+ORDER BY p.year;
+```
+|year|total_emissions|
+|----|---------------|
+|2013|503857|
+|2014|624226|
+|2015|10840415|
+|2016|1640182|
+|2017|340271|
+
+Conclusion: Based on data from 2013 to 2017 regarding the total carbon footprints (PCFs), carbon emissions show a fluctuating trend over the years. Notably, 2015 recorded the highest emissions level, reaching 10,840,415, which may be attributed to specific factors or events in production or consumption. After 2015, emissions significantly decreased, especially by 2017 when it dropped to 340,271, reflecting improvements or changes in production processes, consumption, or environmental mitigation measures. This trend highlights the importance of studying the influencing factors to adjust activities and minimize negative impacts on the environment.
+
+### 3.7. Which industry groups has demonstrated the most notable decrease in carbon footprints (PCFs) over time?
